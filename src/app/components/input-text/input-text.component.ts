@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Project } from '../../data/projects';
 // import { MatIconModule } from '@angular/material/icon';
 
@@ -11,4 +11,9 @@ import { Project } from '../../data/projects';
 })
 export class InputTextComponent {
   @Input() project!: Project;
+  @Output() modelEvent = new EventEmitter<string>();
+
+  choisirModel(description: string) {
+    this.modelEvent.emit(description);
+  }
 }
