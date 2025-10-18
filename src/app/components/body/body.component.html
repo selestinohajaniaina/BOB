@@ -1,0 +1,93 @@
+<div class="p-4 flex flex-col items-center">
+    <div class="w-full max-w-3xl flex flex-col gap-2">
+        <div class="flex items-center p-3 rounded-2xl border border-green-500 shadow-xl transition duration-300 ease-in-out hover:border-green-500">
+
+            <button class="flex md:block hidden items-center text-sm font-medium text-gray-400 hover:text-green-500 mr-4 ml-1 transition duration-150 ease-in-out">
+                <svg class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.526.321 1.021.58 1.573.91M12 11a1 1 0 100-2 1 1 0 000 2z" />
+                </svg>
+            </button>
+
+            <textarea
+                [(ngModel)]="description"
+                placeholder="Décrire votre projet"
+                class="w-full text-lg text-gray-400 placeholder-gray-500 focus:outline-none py-2 resize-y"
+                rows="2"
+            ></textarea>
+
+
+            <button class="flex-shrink-0 flex items-center justify-center h-8 w-8 text-gray-400 hover:text-green-500 transition duration-150 ease-in-out">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0v-1a1 1 0 012 0v1a5 5 0 0010 0v-1a1 1 0 012 0v1zm-7 10a5 5 0 01-5-5h10a5 5 0 01-5 5z" />
+                </svg>
+            </button>
+        </div>
+        @if(!useCaseLoading) {
+            <button (click)="generateUseCase()" class="bg-green-500 hover:bg-green-400 hover:scale-[1.01] shadow-lg rounded-lg text-white text-center self-start px-3 py-2 my-2 mx-2">
+                <i class="fa-solid fa-diagram-project"></i>
+                Générer le diagramme de cas d’utilisation
+            </button>
+        } @else {
+            <button class="bg-green-500 shadow-lg rounded-lg text-white text-center self-start px-3 py-2 my-2 mx-2">
+                <i class="fa-solid fa-fan animate-spin "></i>
+                En réflexion...
+            </button>
+        }
+    </div>
+</div>
+
+@if(urlUseCase) {
+    <div class="flex flex-col items-center">
+        <div class="w-full max-w-3xl m-4">
+            <app-svg-viewer title="Diagramme de cas d'utilisation" [url]="urlUseCase"/>
+            
+            @if(!classLoading) {
+                <button (click)="generateClass()" class="bg-green-500 hover:bg-green-400 hover:scale-[1.01] shadow-lg rounded-lg text-white text-center self-start px-3 py-2 my-2 mx-2">
+                    <i class="fa-solid fa-diagram-project"></i>
+                    Générer le diagramme de classes
+                </button>
+            } @else {
+                <button class="bg-green-500 shadow-lg rounded-lg text-white text-center self-start px-3 py-2 my-2 mx-2">
+                    <i class="fa-solid fa-fan animate-spin "></i>
+                    En réflexion...
+                </button>
+            }
+        </div>
+    </div>
+}
+
+@if(urlClass) {
+    <div class="flex flex-col items-center">
+        <div class="w-full max-w-3xl m-4">
+            <app-svg-viewer title="Diagramme de classe" [url]="urlClass"/>
+            
+            @if(!activityLoading) {
+                <button (click)="generateActivity()" class="bg-green-500 hover:bg-green-400 hover:scale-[1.01] shadow-lg rounded-lg text-white text-center self-start px-3 py-2 my-2 mx-2">
+                    <i class="fa-solid fa-diagram-project"></i>
+                    Générer le diagramme d’activité
+                </button>
+            } @else {
+                <button class="bg-green-500 shadow-lg rounded-lg text-white text-center self-start px-3 py-2 my-2 mx-2">
+                    <i class="fa-solid fa-fan animate-spin "></i>
+                    En réflexion...
+                </button>
+            }
+        </div>
+    </div>
+}
+
+@if(urlActivity) {
+    <div class="flex flex-col items-center">
+        <div class="w-full max-w-3xl m-4">
+            <app-svg-viewer title="Diagramme d'activité" [url]="urlActivity"/>
+        </div>
+    </div>
+}
+
+<p id="exemple" class="text-center text-green-500 text-xl mx-2 my-4">Explorez les modeles :</p>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8 m-4">
+    @for(item of projectList; track item) {
+        <app-input-text [project]="item" (click)="choisitModel(item.description)"/>
+    }
+</div>

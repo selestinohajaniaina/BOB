@@ -1,0 +1,33 @@
+<div class="
+            bg-white 
+            p-6 
+            rounded-2xl 
+            shadow-lg 
+            hover:shadow-xl 
+            border 
+            border-gray-200 
+            hover:border-green-500 
+            transition 
+            duration-300 
+            ease-in-out
+            transform hover:-translate-y-1
+        " href="#accueil">
+            <div class="mb-4 text-4xl">
+                {{project.emoji}}
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">
+                {{project.title}}
+            </h3>
+
+            <p class="text-gray-600 text-sm">
+                {{project.description}}
+            </p>
+            
+            <a href="#accueil" class="mt-4 cursor-pointer inline-flex items-center text-sm font-medium text-green-500 hover:text-green-600">
+                En savoir plus 
+                <svg class="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+            </a>
+        </div>
