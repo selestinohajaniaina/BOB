@@ -2,6 +2,8 @@
 
 Bob est un générateur UML basé sur l’IA, pour créer automatiquement des diagrammes de classes, d’activités et de cas d’utilisation à partir de descriptions textuelles précises, facilitant la modélisation des systèmes pour les développeurs.
 
+Demo: [https://bob-mg.vercel.app](https://bob-mg.vercel.app)
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.2.
 
 ## Development server
