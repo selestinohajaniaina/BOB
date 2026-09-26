@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   AbstractControl,
   FormControl,
@@ -52,6 +53,8 @@ export class RegisterComponent {
 
   isLoading = false;
   registrationSuccess = false;
+  registrationError = '';
+  emailInUse = false;
 
   get name(): FormControl<string> {
     return this.registerForm.controls.name;
@@ -76,6 +79,8 @@ export class RegisterComponent {
 
   submit(): void {
     this.registrationSuccess = false;
+    this.registrationError = '';
+    this.emailInUse = false;
 
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
@@ -91,13 +96,21 @@ export class RegisterComponent {
         this.isLoading = false;
         this.registerForm.enable();
       }))
-      .subscribe((result) => {
-        if (!result.success) {
-          return;
+      .subscribe({
+        next: () => {
+          this.registrationSuccess = true;
+          timer(1200).subscribe(() => void this.router.navigateByUrl('/login'));
+        },
+        error: (error: HttpErrorResponse) => {
+          if (error.status === 409) {
+            this.emailInUse = true;
+            this.email.markAsTouched();
+          } else if (error.status === 0) {
+            this.registrationError = 'Impossible de joindre le serveur. Vérifiez votre connexion puis réessayez.';
+          } else {
+            this.registrationError = error.error?.message || 'Une erreur est survenue pendant la création du compte.';
+          }
         }
-
-        this.registrationSuccess = true;
-        timer(1000).subscribe(() => void this.router.navigateByUrl('/login'));
       });
   }
 }

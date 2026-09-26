@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -13,6 +14,7 @@ import { AuthService } from '../../../core/services/auth.service';
 export class LoginComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly loginForm = new FormGroup({
     email: new FormControl('', {
@@ -52,13 +54,20 @@ export class LoginComponent {
         this.isLoading = false;
         this.loginForm.enable();
       }))
-      .subscribe((result) => {
-        if (result.success) {
-          void this.router.navigateByUrl('/');
-          return;
+      .subscribe({
+        next: () => {
+          const redirect = this.route.snapshot.queryParamMap.get('redirect') || '/projects';
+          void this.router.navigateByUrl(redirect.startsWith('/') ? redirect : '/projects');
+        },
+        error: (error: HttpErrorResponse) => {
+          if (error.status === 0) {
+            this.loginError = 'Impossible de joindre le serveur. Vérifiez votre connexion puis réessayez.';
+          } else if (error.status === 401) {
+            this.loginError = 'Email ou mot de passe incorrect.';
+          } else {
+            this.loginError = error.error?.message || 'Une erreur est survenue pendant la connexion.';
+          }
         }
-
-        this.loginError = 'Email ou mot de passe incorrect. Vérifiez vos identifiants.';
       });
   }
 }

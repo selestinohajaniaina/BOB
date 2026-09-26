@@ -46,20 +46,22 @@
             formControlName="email"
             autocomplete="email"
             placeholder="vous@exemple.com"
-            [attr.aria-invalid]="email.invalid && email.touched"
-            [attr.aria-describedby]="email.invalid && email.touched ? 'register-email-error' : null"
+            [attr.aria-invalid]="(email.invalid && email.touched) || emailInUse"
+            [attr.aria-describedby]="(email.invalid && email.touched) || emailInUse ? 'register-email-error' : null"
             class="w-full rounded-xl border bg-white px-4 py-3 text-gray-900 outline-none transition placeholder:text-gray-400 focus:ring-4 disabled:cursor-not-allowed disabled:bg-gray-50"
-            [class.border-red-400]="email.invalid && email.touched"
-            [class.focus:border-red-500]="email.invalid && email.touched"
-            [class.focus:ring-red-100]="email.invalid && email.touched"
-            [class.border-gray-300]="email.valid || email.untouched"
-            [class.focus:border-green-500]="email.valid || email.untouched"
-            [class.focus:ring-green-100]="email.valid || email.untouched"
+            [class.border-red-400]="(email.invalid && email.touched) || emailInUse"
+            [class.focus:border-red-500]="(email.invalid && email.touched) || emailInUse"
+            [class.focus:ring-red-100]="(email.invalid && email.touched) || emailInUse"
+            [class.border-gray-300]="(email.valid || email.untouched) && !emailInUse"
+            [class.focus:border-green-500]="(email.valid || email.untouched) && !emailInUse"
+            [class.focus:ring-green-100]="(email.valid || email.untouched) && !emailInUse"
           />
           @if (email.touched && email.hasError('required')) {
             <p id="register-email-error" class="mt-2 text-sm text-red-600">L’adresse email est obligatoire.</p>
           } @else if (email.touched && email.hasError('email')) {
             <p id="register-email-error" class="mt-2 text-sm text-red-600">Saisissez une adresse email valide.</p>
+          } @else if (emailInUse) {
+            <p id="register-email-error" class="mt-2 text-sm text-red-600">Un compte existe déjà avec cette adresse email.</p>
           }
         </div>
 
@@ -116,8 +118,12 @@
         @if (registrationSuccess) {
           <div role="status" class="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
             <p class="font-semibold">Compte créé avec succès.</p>
-            <p>Simulation locale terminée. Redirection vers la connexion…</p>
+            <p>Vous pouvez maintenant vous connecter. Redirection en cours…</p>
           </div>
+        }
+
+        @if (registrationError) {
+          <div role="alert" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ registrationError }}</div>
         }
 
         <button

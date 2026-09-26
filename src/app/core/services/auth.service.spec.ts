@@ -1,39 +1,44 @@
 import { TestBed } from '@angular/core/testing';
-import { firstValueFrom } from 'rxjs';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { AuthService } from './auth.service';
+import { environment } from '../../../environments/environment';
 
 describe('AuthService', () => {
   let service: AuthService;
+  let http: HttpTestingController;
 
   beforeEach(() => {
+    localStorage.clear();
+    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
     service = TestBed.inject(AuthService);
+    http = TestBed.inject(HttpTestingController);
   });
 
-  it('accepts the local demo credentials', async () => {
-    const result = await firstValueFrom(service.login({
-      email: 'demo@bob.local',
-      password: 'password'
-    }));
+  afterEach(() => http.verify());
 
-    expect(result.success).toBeTrue();
+  it('registers through the backend API', () => {
+    const data = { name: 'Ada', email: 'ada@example.com', password: 'password123' };
+    service.register(data).subscribe((response) => expect(response.user.email).toBe(data.email));
+    const request = http.expectOne(`${environment.apiUrl}/auth/register`);
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual(data);
+    request.flush({ message: 'Compte créé avec succès', user: { id: 1, name: 'Ada', email: data.email } });
   });
 
-  it('rejects invalid local credentials', async () => {
-    const result = await firstValueFrom(service.login({
-      email: 'wrong@bob.local',
-      password: 'incorrect'
-    }));
-
-    expect(result.success).toBeFalse();
+  it('stores the token and public user after login', () => {
+    service.login({ email: 'ada@example.com', password: 'password123' }).subscribe();
+    const request = http.expectOne(`${environment.apiUrl}/auth/login`);
+    request.flush({ message: 'Connexion réussie', token: 'jwt-token', user: { id: 1, name: 'Ada', email: 'ada@example.com' } });
+    expect(localStorage.getItem('bob_auth_token')).toBe('jwt-token');
+    expect(service.getToken()).toBe('jwt-token');
   });
 
-  it('simulates a local registration without persisting it', async () => {
-    const result = await firstValueFrom(service.register({
-      name: 'Ada Lovelace',
-      email: 'ada@bob.local',
-      password: 'password'
-    }));
-
-    expect(result.success).toBeTrue();
+  it('clears the session on logout', () => {
+    localStorage.setItem('bob_auth_token', 'jwt-token');
+    localStorage.setItem('bob_auth_user', '{}');
+    service.logout();
+    expect(service.getToken()).toBeNull();
+    expect(localStorage.getItem('bob_auth_user')).toBeNull();
   });
 });
