@@ -14,6 +14,11 @@ describe('InputTextComponent', () => {
 
     fixture = TestBed.createComponent(InputTextComponent);
     component = fixture.componentInstance;
+    component.project = {
+      emoji: '🧪',
+      title: 'Projet de test',
+      description: 'Description de test'
+    };
     fixture.detectChanges();
   });
 
