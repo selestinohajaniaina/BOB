@@ -1,5 +1,4 @@
-<app-navbar />
-<main class="min-h-screen bg-gray-50 py-10"><div class="mx-auto max-w-5xl px-4 sm:px-6"><a routerLink="/projects" class="font-semibold text-green-700">← Retour aux projets</a>
+<main class="py-10"><div class="mx-auto max-w-5xl px-4 sm:px-6"><a routerLink="/projects" class="font-semibold text-green-700">← Retour aux projets</a>
   @if (isLoading) {<div class="mt-8 h-72 animate-pulse rounded-3xl bg-gray-200"></div>}
   @else if (error) {<div role="alert" class="mt-8 rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">{{ error }}</div>}
   @else if (project) {

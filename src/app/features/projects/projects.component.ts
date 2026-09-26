@@ -2,14 +2,14 @@ import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
-import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { Project, ProjectService } from '../../core/services/project.service';
 
-@Component({ selector: 'app-projects', standalone: true, imports: [NavbarComponent, RouterLink, ReactiveFormsModule, DatePipe], templateUrl: './projects.component.html' })
+@Component({ selector: 'app-projects', standalone: true, imports: [RouterLink, ReactiveFormsModule, DatePipe], templateUrl: './projects.component.html' })
 export class ProjectsComponent {
   private readonly projectService = inject(ProjectService);
+  private readonly route = inject(ActivatedRoute);
   projects: Project[] = [];
   search = '';
   isLoading = true;
@@ -24,7 +24,10 @@ export class ProjectsComponent {
     description: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(2000)] })
   });
 
-  constructor() { this.loadProjects(); }
+  constructor() {
+    this.loadProjects();
+    if (this.route.snapshot.queryParamMap.get('new') === '1') this.openCreate();
+  }
   get filteredProjects(): Project[] {
     const query = this.search.trim().toLowerCase();
     return query ? this.projects.filter((p) => `${p.name} ${p.description || ''}`.toLowerCase().includes(query)) : this.projects;

@@ -3,10 +3,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
-import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { Project, ProjectService } from '../../core/services/project.service';
 
-@Component({ selector: 'app-project-detail', standalone: true, imports: [NavbarComponent, RouterLink, DatePipe], templateUrl: './project-detail.component.html' })
+@Component({ selector: 'app-project-detail', standalone: true, imports: [RouterLink, DatePipe], templateUrl: './project-detail.component.html' })
 export class ProjectDetailComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly service = inject(ProjectService);

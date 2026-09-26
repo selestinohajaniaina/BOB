@@ -41,4 +41,22 @@ describe('AuthService', () => {
     expect(service.getToken()).toBeNull();
     expect(localStorage.getItem('bob_auth_user')).toBeNull();
   });
+
+  it('updates the profile and the locally exposed user', () => {
+    const user = { id: 1, name: 'Ada Lovelace', email: 'ada@bob.local' };
+    service.updateProfile({ name: user.name, email: user.email }).subscribe();
+    const request = http.expectOne(`${environment.apiUrl}/auth/me`);
+    expect(request.request.method).toBe('PATCH');
+    request.flush({ message: 'Profil mis à jour avec succès', user });
+    expect(JSON.parse(localStorage.getItem('bob_auth_user') || '{}').name).toBe(user.name);
+  });
+
+  it('changes the password through the protected API', () => {
+    const data = { currentPassword: 'password123', newPassword: 'new-password123', confirmPassword: 'new-password123' };
+    service.changePassword(data).subscribe();
+    const request = http.expectOne(`${environment.apiUrl}/auth/me/password`);
+    expect(request.request.method).toBe('PATCH');
+    expect(request.request.body).toEqual(data);
+    request.flush({ message: 'Mot de passe modifié avec succès' });
+  });
 });

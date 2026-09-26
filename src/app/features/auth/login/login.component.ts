@@ -56,8 +56,8 @@ export class LoginComponent {
       }))
       .subscribe({
         next: () => {
-          const redirect = this.route.snapshot.queryParamMap.get('redirect') || '/projects';
-          void this.router.navigateByUrl(redirect.startsWith('/') ? redirect : '/projects');
+          const redirect = this.route.snapshot.queryParamMap.get('redirect') || '/dashboard';
+          void this.router.navigateByUrl(redirect.startsWith('/') ? redirect : '/dashboard');
         },
         error: (error: HttpErrorResponse) => {
           if (error.status === 0) {

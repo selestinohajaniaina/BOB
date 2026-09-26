@@ -3,9 +3,11 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-export interface User { id: number; name: string; email: string; }
+export interface User { id: number; name: string; email: string; createdAt?: string; updatedAt?: string; }
 export interface LoginCredentials { email: string; password: string; }
 export interface RegisterData { name: string; email: string; password: string; }
+export interface UpdateProfileData { name: string; email: string; }
+export interface ChangePasswordData { currentPassword: string; newPassword: string; confirmPassword: string; }
 export interface LoginResponse { message: string; token: string; user: User; }
 export interface RegisterResponse { message: string; user: User; }
 export interface CurrentUserResponse { user: User; }
@@ -40,6 +42,16 @@ export class AuthService {
     );
   }
 
+  updateProfile(data: UpdateProfileData): Observable<CurrentUserResponse & { message: string }> {
+    return this.http.patch<CurrentUserResponse & { message: string }>(`${this.authUrl}/me`, data).pipe(
+      tap(({ user }) => this.updateStoredUser(user))
+    );
+  }
+
+  changePassword(data: ChangePasswordData): Observable<{ message: string }> {
+    return this.http.patch<{ message: string }>(`${this.authUrl}/me/password`, data);
+  }
+
   getToken(): string | null { return localStorage.getItem(this.tokenKey); }
 
   logout(): void {
@@ -50,6 +62,10 @@ export class AuthService {
 
   private saveSession(token: string, user: User): void {
     localStorage.setItem(this.tokenKey, token);
+    this.updateStoredUser(user);
+  }
+
+  private updateStoredUser(user: User): void {
     localStorage.setItem(this.userKey, JSON.stringify(user));
     this.currentUserSubject.next(user);
   }
