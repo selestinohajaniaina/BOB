@@ -101,17 +101,15 @@
               placeholder="Ex. Montre les acteurs et leurs principales interactions avec le système."
               class="w-full resize-y rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
             ></textarea
-            >@if (promptControl.touched && promptControl.hasError('required')) {
-            <p class="mt-2 text-sm text-red-600">
-              La demande de génération est obligatoire.
-            </p>
-            }
+            >
             <p class="mt-1 text-right text-xs text-slate-500">
               {{ promptControl.getRawValue().length }}/4000
             </p>
           </div>
           <button
+            type="button"
             (click)="generate()"
+            [disabled]="isGenerating || promptControl.invalid"
             class="flex w-full items-center justify-center rounded-xl bg-emerald-500 px-5 py-3 font-bold text-slate-950 hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {{ isGenerating ? "Génération en cours…" : "Générer le diagramme" }}
@@ -130,7 +128,7 @@
               Résultat
             </p>
             <h2 id="result-title" class="mt-2 text-2xl font-bold">
-              Aperçu PlantUML
+              Aperçu du diagramme
             </h2>
           </div>
           @if (selectedDiagram) {<span
@@ -155,21 +153,12 @@
           class="mt-6 overflow-auto rounded-2xl border border-slate-200 bg-white p-3"
         >
           <img
-            [src]="diagramUrl(selectedDiagram)"
+            [src]="svgUrl(selectedDiagram)"
             [alt]="'Diagramme de cas d’utilisation ' + selectedDiagram.name"
             class="mx-auto h-auto max-w-full"
             loading="lazy"
           />
         </div>
-        <details class="mt-5 rounded-xl bg-slate-950 text-slate-100">
-          <summary class="cursor-pointer px-4 py-3 font-bold">
-            Voir le code PlantUML
-          </summary>
-          <pre
-            class="overflow-x-auto whitespace-pre-wrap px-4 pb-4 text-xs leading-6"
-            >{{ selectedDiagram.plantUml }}</pre
-          >
-        </details>
         } @else {
         <div
           class="mt-8 flex min-h-96 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 px-6 text-center"
@@ -226,9 +215,10 @@
             <button
               type="button"
               (click)="open(diagram)"
+              [disabled]="openingId === diagram.id"
               class="rounded-lg bg-slate-950 px-3 py-2 text-sm font-bold text-white"
             >
-              Ouvrir</button
+              {{ openingId === diagram.id ? "Ouverture…" : "Ouvrir" }}</button
             ><button
               type="button"
               (click)="delete(diagram)"
