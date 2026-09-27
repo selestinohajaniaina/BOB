@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './features/home/home.component';
 import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';
-import { PrototypeComponent } from './features/prototype/prototype.component';
 import { authGuard } from './core/guards/auth.guard';
 import { ProjectsComponent } from './features/projects/projects.component';
 import { ProjectDetailComponent } from './features/projects/project-detail.component';
@@ -30,7 +29,7 @@ export const routes: Routes = [
   },
   {
     path: 'diagrams', component: WorkspaceLayoutComponent, canActivate: [authGuard], children: [
-      { path: '', component: ComingSoonComponent, title: 'Diagrammes | BOB', data: { titleText: 'Diagrammes', icon: '⌘', description: 'La création et la génération de diagrammes UML seront intégrées lors d’une prochaine étape.' } }
+      { path: '', component: ComingSoonComponent, title: 'Diagrammes | BOB', data: { titleText: 'Diagrammes', icon: '⌘', description: 'Le diagramme de cas d’utilisation est disponible depuis chaque projet. La vue globale des diagrammes sera ajoutée prochainement.' } }
     ]
   },
   {
@@ -62,12 +61,6 @@ export const routes: Routes = [
     path: 'register',
     component: RegisterComponent,
     title: 'Créer un compte | BOB'
-  },
-  {
-    path: 'prototype',
-    component: PrototypeComponent,
-    canActivate: [authGuard],
-    title: 'Prototype UML | BOB'
   },
   {
     path: '**',
