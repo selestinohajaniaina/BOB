@@ -3,8 +3,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-export interface Project { id: number; name: string; description: string | null; createdAt: string; updatedAt: string; }
-export interface ProjectPayload { name: string; description?: string; }
+export interface Project { id: number; name: string; description: string | null; context?: string | null; hasContext?: boolean; createdAt: string; updatedAt: string; }
+export interface ProjectPayload { name: string; description?: string; context?: string | null; }
 interface ProjectsResponse { projects: Project[]; }
 interface ProjectResponse { message?: string; project: Project; }
 

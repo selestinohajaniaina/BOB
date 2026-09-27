@@ -1,8 +1,186 @@
-<main class="py-10"><div class="mx-auto max-w-5xl px-4 sm:px-6"><a routerLink="/projects" class="font-semibold text-green-700">← Retour aux projets</a>
-  @if (isLoading) {<div class="mt-8 h-72 animate-pulse rounded-3xl bg-gray-200"></div>}
-  @else if (error) {<div role="alert" class="mt-8 rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">{{ error }}</div>}
-  @else if (project) {
-    <section class="mt-8 rounded-3xl border bg-white p-7 shadow-sm sm:p-10"><span class="rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-700">Projet #{{ project.id }}</span><h1 class="mt-5 text-3xl font-bold sm:text-4xl">{{ project.name }}</h1><p class="mt-5 whitespace-pre-line leading-7 text-gray-600">{{ project.description || 'Aucune description.' }}</p><dl class="mt-8 grid gap-4 border-t pt-6 text-sm sm:grid-cols-2"><div><dt class="text-gray-500">Créé le</dt><dd class="mt-1 font-semibold">{{ project.createdAt | date:'dd MMMM yyyy à HH:mm' }}</dd></div><div><dt class="text-gray-500">Modifié le</dt><dd class="mt-1 font-semibold">{{ project.updatedAt | date:'dd MMMM yyyy à HH:mm' }}</dd></div></dl></section>
-    <section class="mt-8 rounded-3xl border bg-white p-7 sm:p-10"><div class="flex items-center justify-between"><div><p class="text-sm font-bold uppercase tracking-widest text-green-600">Diagrammes</p><h2 class="mt-2 text-2xl font-bold">Diagrammes du projet</h2></div><button type="button" disabled title="Fonctionnalité prévue dans une prochaine étape" class="rounded-xl bg-gray-200 px-5 py-3 font-semibold text-gray-500">Créer un diagramme</button></div><div class="mt-8 rounded-2xl border border-dashed py-14 text-center"><p class="text-4xl">◇</p><p class="mt-3 font-semibold">Aucun diagramme pour le moment</p><p class="mt-2 text-sm text-gray-500">La génération UML sera ajoutée lors d’une prochaine étape.</p></div></section>
-  }
-</div></main>
+<main class="py-10">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6">
+    <a routerLink="/projects" class="font-semibold text-green-700"
+      >← Retour aux projets</a
+    >
+    @if (isLoading) {
+    <div class="mt-8 h-72 animate-pulse rounded-3xl bg-gray-200"></div>
+    } @else if (error) {
+    <div
+      role="alert"
+      class="mt-8 rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700"
+    >
+      {{ error }}
+    </div>
+    } @else if (project) {
+    <section class="mt-8 rounded-3xl border bg-white p-7 shadow-sm sm:p-10">
+      <span
+        class="rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-700"
+        >Projet #{{ project.id }}</span
+      >
+      <h1 class="mt-5 text-3xl font-bold sm:text-4xl">{{ project.name }}</h1>
+      <p class="mt-5 whitespace-pre-line leading-7 text-gray-600">
+        {{ project.description || "Aucune description." }}
+      </p>
+      <dl class="mt-8 grid gap-4 border-t pt-6 text-sm sm:grid-cols-2">
+        <div>
+          <dt class="text-gray-500">Créé le</dt>
+          <dd class="mt-1 font-semibold">
+            {{ project.createdAt | date : "dd MMMM yyyy à HH:mm" }}
+          </dd>
+        </div>
+        <div>
+          <dt class="text-gray-500">Modifié le</dt>
+          <dd class="mt-1 font-semibold">
+            {{ project.updatedAt | date : "dd MMMM yyyy à HH:mm" }}
+          </dd>
+        </div>
+      </dl>
+    </section>
+    <section class="mt-8 rounded-3xl border bg-white p-7 shadow-sm sm:p-10">
+      <div
+        class="flex flex-col justify-between gap-4 sm:flex-row sm:items-start"
+      >
+        <div>
+          <p class="text-sm font-bold uppercase tracking-widest text-green-600">
+            Contexte détaillé
+          </p>
+          <h2 class="mt-2 text-2xl font-bold">Base documentaire commune</h2>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            (click)="startManualEdit()"
+            class="rounded-xl border px-4 py-2 text-sm font-bold hover:border-green-500"
+          >
+            {{
+              project.context ? "Modifier le contexte" : "Ajouter le contexte"
+            }}</button
+          ><button
+            type="button"
+            (click)="openImport()"
+            class="rounded-xl bg-gray-900 px-4 py-2 text-sm font-bold text-white"
+          >
+            Importer un fichier
+          </button>
+        </div>
+      </div>
+      @if (contextSuccess) {
+      <div
+        role="status"
+        class="mt-5 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-green-700"
+      >
+        {{ contextSuccess }}
+      </div>
+      } @if (contextError) {
+      <div
+        role="alert"
+        class="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700"
+      >
+        {{ contextError }}
+      </div>
+      } @if (editContext) {
+      <div class="mt-6">
+        <label for="detail-context" class="mb-2 block font-bold"
+          >Contexte détaillé</label
+        ><textarea
+          id="detail-context"
+          [formControl]="contextControl"
+          rows="14"
+          placeholder="Décrivez ici le contexte complet du projet…"
+          class="w-full resize-y rounded-xl border border-gray-300 px-4 py-3 font-mono text-sm leading-6 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-100"
+        ></textarea>
+        <div
+          class="mt-3 flex flex-col justify-between gap-3 sm:flex-row sm:items-center"
+        >
+          <div>
+            <label
+              for="detail-context-file"
+              class="inline-flex cursor-pointer rounded-xl border px-4 py-2 text-sm font-bold hover:border-green-500 hover:bg-green-50"
+              >Importer un fichier</label
+            ><input
+              id="detail-context-file"
+              type="file"
+              accept=".md,.txt,text/markdown,text/plain"
+              (change)="selectContextFile($event)"
+              [disabled]="isReadingFile"
+              class="sr-only"
+            /><span class="ml-3 text-xs text-gray-500"
+              >.md ou .txt · 512 Kio max.</span
+            >
+          </div>
+          @if (isReadingFile) {<span
+            class="text-sm font-semibold text-green-700"
+            >Lecture du fichier…</span
+          >}
+        </div>
+        @if (selectedFileName) {
+        <p role="status" class="mt-3 text-sm text-green-700">
+          Le contenu de « {{ selectedFileName }} » a été chargé et reste
+          modifiable.
+        </p>
+        }
+        <div class="mt-4 flex justify-end gap-3">
+          <button
+            type="button"
+            (click)="editContext = false"
+            class="rounded-xl border px-4 py-2 font-bold"
+          >
+            Annuler</button
+          ><button
+            type="button"
+            (click)="saveManualContext()"
+            [disabled]="isSaving || isReadingFile"
+            class="rounded-xl bg-green-500 px-4 py-2 font-bold text-white disabled:opacity-50"
+          >
+            {{ isSaving ? "Enregistrement…" : "Enregistrer" }}
+          </button>
+        </div>
+      </div>
+      } @else if (project.context) {
+      <pre
+        class="mt-6 max-h-[34rem] overflow-auto whitespace-pre-wrap rounded-2xl bg-gray-50 p-5 font-sans text-sm leading-7 text-gray-700"
+        >{{ project.context }}</pre
+      >
+      } @else {
+      <div
+        class="mt-6 rounded-2xl border border-dashed border-gray-300 py-12 text-center"
+      >
+        <p class="text-4xl" aria-hidden="true">▤</p>
+        <p class="mt-3 font-bold">
+          Aucun contexte détaillé n’a encore été ajouté.
+        </p>
+        <p class="mt-2 text-sm text-gray-500">
+          Écrivez le contexte ou importez un fichier .md ou .txt.
+        </p>
+      </div>
+      }
+    </section>
+    <section class="mt-8 rounded-3xl border bg-white p-7 sm:p-10">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-bold uppercase tracking-widest text-green-600">
+            Diagrammes
+          </p>
+          <h2 class="mt-2 text-2xl font-bold">Diagrammes du projet</h2>
+        </div>
+        <button
+          type="button"
+          disabled
+          title="Fonctionnalité prévue dans une prochaine étape"
+          class="rounded-xl bg-gray-200 px-5 py-3 font-semibold text-gray-500"
+        >
+          Créer un diagramme
+        </button>
+      </div>
+      <div class="mt-8 rounded-2xl border border-dashed py-14 text-center">
+        <p class="text-4xl">◇</p>
+        <p class="mt-3 font-semibold">Aucun diagramme pour le moment</p>
+        <p class="mt-2 text-sm text-gray-500">
+          La génération UML sera ajoutée lors d’une prochaine étape.
+        </p>
+      </div>
+    </section>
+    }
+  </div>
+</main>
