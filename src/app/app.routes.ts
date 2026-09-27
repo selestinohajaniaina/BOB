@@ -6,6 +6,7 @@ import { PrototypeComponent } from './features/prototype/prototype.component';
 import { authGuard } from './core/guards/auth.guard';
 import { ProjectsComponent } from './features/projects/projects.component';
 import { ProjectDetailComponent } from './features/projects/project-detail.component';
+import { ProjectDiagramsComponent } from './features/projects/project-diagrams.component';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { WorkspaceLayoutComponent } from './layouts/workspace-layout/workspace-layout.component';
 import { ComingSoonComponent } from './features/coming-soon/coming-soon.component';
@@ -23,6 +24,7 @@ export const routes: Routes = [
   {
     path: 'projects', component: WorkspaceLayoutComponent, canActivate: [authGuard], children: [
       { path: '', component: ProjectsComponent, title: 'Mes projets | BOB' },
+      { path: ':id/diagrams', component: ProjectDiagramsComponent, title: 'Diagrammes du projet | BOB' },
       { path: ':id', component: ProjectDetailComponent, title: 'Projet | BOB' }
     ]
   },

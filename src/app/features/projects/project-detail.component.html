@@ -14,10 +14,18 @@
     </div>
     } @else if (project) {
     <section class="mt-8 rounded-3xl border bg-white p-7 shadow-sm sm:p-10">
-      <span
-        class="rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-700"
-        >Projet #{{ project.id }}</span
+      <div
+        class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center"
       >
+        <span
+          class="self-start rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-700"
+          >Projet #{{ project.id }}</span
+        ><a
+          [routerLink]="['/projects', project.id, 'diagrams']"
+          class="inline-flex items-center justify-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-bold text-white hover:bg-gray-800"
+          >Voir les diagrammes →</a
+        >
+      </div>
       <h1 class="mt-5 text-3xl font-bold sm:text-4xl">{{ project.name }}</h1>
       <p class="mt-5 whitespace-pre-line leading-7 text-gray-600">
         {{ project.description || "Aucune description." }}
@@ -45,7 +53,6 @@
           <p class="text-sm font-bold uppercase tracking-widest text-green-600">
             Contexte détaillé
           </p>
-          <h2 class="mt-2 text-2xl font-bold">Base documentaire commune</h2>
         </div>
         <div class="flex flex-wrap gap-2">
           <button
@@ -55,13 +62,7 @@
           >
             {{
               project.context ? "Modifier le contexte" : "Ajouter le contexte"
-            }}</button
-          ><button
-            type="button"
-            (click)="openImport()"
-            class="rounded-xl bg-gray-900 px-4 py-2 text-sm font-bold text-white"
-          >
-            Importer un fichier
+            }}
           </button>
         </div>
       </div>
@@ -106,7 +107,7 @@
               [disabled]="isReadingFile"
               class="sr-only"
             /><span class="ml-3 text-xs text-gray-500"
-              >.md ou .txt · 512 Kio max.</span
+              >.md ou .txt · 512 Ko max.</span
             >
           </div>
           @if (isReadingFile) {<span
@@ -138,10 +139,10 @@
         </div>
       </div>
       } @else if (project.context) {
-      <pre
-        class="mt-6 max-h-[34rem] overflow-auto whitespace-pre-wrap rounded-2xl bg-gray-50 p-5 font-sans text-sm leading-7 text-gray-700"
-        >{{ project.context }}</pre
-      >
+      <div
+        class="markdown-content mt-6 overflow-x-auto rounded-2xl border border-gray-100 bg-gray-50 p-5 text-gray-700 sm:p-7"
+        [innerHTML]="project.context | markdown"
+      ></div>
       } @else {
       <div
         class="mt-6 rounded-2xl border border-dashed border-gray-300 py-12 text-center"
@@ -155,31 +156,6 @@
         </p>
       </div>
       }
-    </section>
-    <section class="mt-8 rounded-3xl border bg-white p-7 sm:p-10">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-sm font-bold uppercase tracking-widest text-green-600">
-            Diagrammes
-          </p>
-          <h2 class="mt-2 text-2xl font-bold">Diagrammes du projet</h2>
-        </div>
-        <button
-          type="button"
-          disabled
-          title="Fonctionnalité prévue dans une prochaine étape"
-          class="rounded-xl bg-gray-200 px-5 py-3 font-semibold text-gray-500"
-        >
-          Créer un diagramme
-        </button>
-      </div>
-      <div class="mt-8 rounded-2xl border border-dashed py-14 text-center">
-        <p class="text-4xl">◇</p>
-        <p class="mt-3 font-semibold">Aucun diagramme pour le moment</p>
-        <p class="mt-2 text-sm text-gray-500">
-          La génération UML sera ajoutée lors d’une prochaine étape.
-        </p>
-      </div>
     </section>
     }
   </div>

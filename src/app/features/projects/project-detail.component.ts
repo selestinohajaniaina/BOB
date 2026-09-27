@@ -6,8 +6,9 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { Project, ProjectService } from '../../core/services/project.service';
 import { canReplaceContext, readContextFile, validateContextFile } from './context-file.util';
+import { MarkdownPipe } from '../../shared/pipes/markdown.pipe';
 
-@Component({ selector: 'app-project-detail', standalone: true, imports: [RouterLink, DatePipe, ReactiveFormsModule], templateUrl: './project-detail.component.html' })
+@Component({ selector: 'app-project-detail', standalone: true, imports: [RouterLink, DatePipe, ReactiveFormsModule, MarkdownPipe], templateUrl: './project-detail.component.html' })
 export class ProjectDetailComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly service = inject(ProjectService);

@@ -1,2 +1,24 @@
-/* You can add global styles to this file, and also import other style files */
 @import "tailwindcss";
+
+.markdown-content { font-size: .95rem; line-height: 1.75; overflow-wrap: anywhere; }
+.markdown-content > :first-child { margin-top: 0; }
+.markdown-content > :last-child { margin-bottom: 0; }
+.markdown-content h1, .markdown-content h2, .markdown-content h3 { color: #0f172a; font-weight: 800; line-height: 1.25; margin: 1.6em 0 .65em; }
+.markdown-content h1 { font-size: 1.875rem; border-bottom: 1px solid #dbe3ea; padding-bottom: .4em; }
+.markdown-content h2 { font-size: 1.5rem; border-bottom: 1px solid #e2e8f0; padding-bottom: .3em; }
+.markdown-content h3 { font-size: 1.2rem; }
+.markdown-content p, .markdown-content ul, .markdown-content ol, .markdown-content blockquote, .markdown-content pre, .markdown-content table { margin: 1em 0; }
+.markdown-content ul, .markdown-content ol { padding-left: 1.6rem; }
+.markdown-content ul { list-style: disc; }
+.markdown-content ol { list-style: decimal; }
+.markdown-content li + li { margin-top: .3rem; }
+.markdown-content a { color: #047857; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.markdown-content blockquote { border-left: 4px solid #34d399; background: #ecfdf5; border-radius: 0 .5rem .5rem 0; color: #475569; padding: .75rem 1rem; }
+.markdown-content code { border-radius: .35rem; background: #e2e8f0; color: #0f172a; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .875em; padding: .15em .35em; }
+.markdown-content pre { overflow-x: auto; border-radius: .75rem; background: #0f172a; color: #e2e8f0; padding: 1rem; }
+.markdown-content pre code { background: transparent; color: inherit; padding: 0; }
+.markdown-content hr { border: 0; border-top: 1px solid #cbd5e1; margin: 1.75rem 0; }
+.markdown-content table { border-collapse: collapse; display: block; max-width: 100%; overflow-x: auto; width: max-content; }
+.markdown-content th, .markdown-content td { border: 1px solid #cbd5e1; padding: .55rem .8rem; text-align: left; }
+.markdown-content th { background: #e2e8f0; color: #0f172a; font-weight: 700; }
+.markdown-content img { height: auto; max-width: 100%; }
