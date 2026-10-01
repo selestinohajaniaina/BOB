@@ -22,7 +22,6 @@ export class DiagramService {
   private readonly projectsUrl = `${environment.apiUrl}/projects`;
   constructor(private readonly http: HttpClient) {}
   getDiagrams(projectId: number): Observable<DiagramsResponse> { return this.http.get<DiagramsResponse>(`${this.projectsUrl}/${projectId}/diagrams`); }
-  getDiagram(projectId: number, diagramId: number): Observable<DiagramResponse> { return this.http.get<DiagramResponse>(`${this.projectsUrl}/${projectId}/diagrams/${diagramId}`); }
   generateUseCase(projectId: number, prompt: string): Observable<DiagramResponse> { return this.http.post<DiagramResponse>(`${this.projectsUrl}/${projectId}/diagrams`, { type: 'use_case', prompt }); }
   deleteDiagram(projectId: number, diagramId: number): Observable<{ message: string }> { return this.http.delete<{ message: string }>(`${this.projectsUrl}/${projectId}/diagrams/${diagramId}`); }
 }

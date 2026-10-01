@@ -10,7 +10,7 @@ describe('ProjectDiagramsComponent', () => {
   let fixture: ComponentFixture<ProjectDiagramsComponent>;
   const project = { id: 15, name: 'Gestion de bibliothèque', description: 'Projet UML', context: '# Contexte', createdAt: '2026-01-01', updatedAt: '2026-01-02' };
   const service = jasmine.createSpyObj<ProjectService>('ProjectService', ['getProject']);
-  const diagramService = jasmine.createSpyObj<DiagramService>('DiagramService', ['getDiagrams', 'getDiagram', 'generateUseCase', 'deleteDiagram']);
+  const diagramService = jasmine.createSpyObj<DiagramService>('DiagramService', ['getDiagrams', 'generateUseCase', 'deleteDiagram']);
   beforeEach(async () => {
     service.getProject.and.returnValue(of({ project }));
     diagramService.getDiagrams.and.returnValue(of({ diagrams: [] }));
@@ -44,6 +44,21 @@ describe('ProjectDiagramsComponent', () => {
     diagramService.generateUseCase.and.returnValue(of({ message: 'ok', diagram }));
     fixture.componentInstance.generate();
     expect(diagramService.generateUseCase).toHaveBeenCalledWith(15, '');
+  });
+  it('opens a listed diagram locally with its PlantUML', () => {
+    const diagram = { id: 5, projectId: 15, name: 'Cas d’utilisation', type: 'use_case' as const, prompt: 'Acteurs', plantUml: '@startuml\nactor User\nUser --> (Login)\n@enduml', createdAt: '2026-01-01', updatedAt: '2026-01-01' };
+
+    fixture.componentInstance.diagrams = [diagram];
+    fixture.componentInstance.open(diagram);
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.selectedDiagram).toBe(diagram);
+    expect(fixture.componentInstance.selectedDiagram?.plantUml).toBe(diagram.plantUml);
+    expect((fixture.nativeElement as HTMLElement).querySelector('[role="img"]')).not.toBeNull();
+
+    fixture.componentInstance.openEditModal();
+    fixture.detectChanges();
+    expect(fixture.componentInstance.bobDiagram?.actors[0].name).toBe('User');
   });
   it('opens and closes the preparatory edit modal without changing the diagram', () => {
     const diagram = { id: 4, projectId: 15, name: 'Cas d’utilisation', type: 'use_case' as const, prompt: '', plantUml: '@startuml\nactor User\nUser --> (Login)\n@enduml', createdAt: '2026-01-01', updatedAt: '2026-01-01' };

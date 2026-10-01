@@ -10,7 +10,12 @@ describe('DiagramService', () => {
   afterEach(() => http.verify());
   it('uses only the protected BOB backend API', () => {
     const root = `${environment.apiUrl}/projects/3/diagrams`;
-    service.getDiagrams(3).subscribe(); const request = http.expectOne(root); expect(request.request.method).toBe('GET'); request.flush({ diagrams: [] }); http.expectNone((req) => req.url.includes('generativelanguage'));
+    let listedPlantUml = '';
+    service.getDiagrams(3).subscribe(({ diagrams }) => listedPlantUml = diagrams[0].plantUml);
+    const request = http.expectOne(root); expect(request.request.method).toBe('GET');
+    request.flush({ diagrams: [{ id: 7, projectId: 3, name: 'Use case', type: 'use_case', prompt: '', plantUml: '@startuml\nactor User\n@enduml', createdAt: '2026-01-01', updatedAt: '2026-01-01' }] });
+    expect(listedPlantUml).toContain('@startuml');
+    http.expectNone((req) => req.url.includes('generativelanguage'));
   });
   it('generates a use case diagram through BOB', () => {
     service.generateUseCase(3, 'Montrer les acteurs').subscribe();

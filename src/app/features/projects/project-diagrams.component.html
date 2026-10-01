@@ -144,14 +144,14 @@
           </div>
           }
         </div>
-        @if (isGenerating || openingId !== null) {
+        @if (isGenerating) {
         <div
           class="mt-8 flex min-h-96 flex-col items-center justify-center rounded-2xl bg-slate-50 text-center"
         >
           <span
             class="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-emerald-500"
           ></span>
-          <p class="mt-5 font-bold">{{ isGenerating ? "BOB analyse le contexte du projet…" : "Chargement du diagramme…" }}</p>
+          <p class="mt-5 font-bold">BOB analyse le contexte du projet…</p>
           <p class="mt-2 text-sm text-slate-500">
             La génération peut prendre quelques instants.
           </p>
@@ -223,10 +223,9 @@
             <button
               type="button"
               (click)="open(diagram)"
-              [disabled]="openingId === diagram.id"
               class="rounded-lg bg-slate-950 px-3 py-2 text-sm font-bold text-white cursor-pointer"
             >
-              {{ openingId === diagram.id ? "Ouverture…" : "Ouvrir" }}</button
+              Ouvrir</button
             ><button
               type="button"
               (click)="delete(diagram)"
