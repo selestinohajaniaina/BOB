@@ -1,18 +1,22 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, HostListener, ViewChild, inject } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, JsonPipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
 import { Project, ProjectService } from '../../core/services/project.service';
 import { Diagram, DiagramService } from '../../core/services/diagram.service';
 import { render } from 'puml-canvas-js';
+import { BobDiagram } from './diagram-editor/bob-diagram.model';
+import { PlantUmlToBobJsonService } from './diagram-editor/plant-uml-to-bob-json.service';
+import { UseCaseEditorComponent } from './diagram-editor/use-case-editor.component';
 
-@Component({ selector: 'app-project-diagrams', standalone: true, imports: [RouterLink, ReactiveFormsModule, DatePipe], templateUrl: './project-diagrams.component.html' })
+@Component({ selector: 'app-project-diagrams', standalone: true, imports: [RouterLink, ReactiveFormsModule, DatePipe, JsonPipe, UseCaseEditorComponent], templateUrl: './project-diagrams.component.html' })
 export class ProjectDiagramsComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly projectService = inject(ProjectService);
   private readonly diagramService = inject(DiagramService);
+  private readonly plantUmlToBobJson = inject(PlantUmlToBobJsonService);
   private renderHost: HTMLElement | null = null;
   @ViewChild('diagramCanvas')
   set diagramCanvas(element: ElementRef<HTMLElement> | undefined) {
@@ -28,6 +32,8 @@ export class ProjectDiagramsComponent {
   deletingId: number | null = null;
   openingId: number | null = null;
   isEditModalOpen = false;
+  bobDiagram: BobDiagram | null = null;
+  editorError = '';
   renderError = '';
   error = '';
   success = '';
@@ -63,6 +69,8 @@ export class ProjectDiagramsComponent {
   open(diagram: Diagram): void {
     this.success = ''; this.error = '';
     this.openingId = diagram.id;
+    console.log("diagram", diagram);
+
     this.diagramService.getDiagram(this.projectId, diagram.id).pipe(finalize(() => this.openingId = null)).subscribe({
       next: ({ diagram: loaded }) => { this.diagrams = this.diagrams.map((item) => item.id === loaded.id ? loaded : item); this.selectDiagram(loaded); },
       error: (error: HttpErrorResponse) => this.error = error.error?.message || 'Impossible d’afficher le diagramme.'
@@ -77,7 +85,16 @@ export class ProjectDiagramsComponent {
     });
   }
   openEditModal(): void {
-    if (this.selectedDiagram) this.isEditModalOpen = true;
+    if (!this.selectedDiagram) return;
+    this.editorError = '';
+    try {
+      this.bobDiagram = this.plantUmlToBobJson.convert(this.selectedDiagram.plantUml);
+    } catch (error) {
+      console.error('Échec de la conversion PlantUML vers le modèle BOB', error);
+      this.bobDiagram = null;
+      this.editorError = 'Impossible de préparer ce diagramme pour l’éditeur.';
+    }
+    this.isEditModalOpen = true;
   }
   closeEditModal(): void { this.isEditModalOpen = false; }
   private selectDiagram(diagram: Diagram): void {

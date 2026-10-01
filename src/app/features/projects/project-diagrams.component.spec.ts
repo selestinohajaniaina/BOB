@@ -53,7 +53,9 @@ describe('ProjectDiagramsComponent', () => {
     const modifyButton = Array.from(element.querySelectorAll('button')).find((button) => button.textContent?.trim() === 'Modifier')!;
     modifyButton.click(); fixture.detectChanges();
     expect(element.querySelector('[role="dialog"]')).not.toBeNull();
-    expect(element.innerText).toContain('L’éditeur UML sera disponible ici prochainement.');
+    expect(element.querySelector('app-use-case-editor')).not.toBeNull();
+    expect(element.innerText).toContain('BOB Diagram JSON');
+    expect(fixture.componentInstance.bobDiagram?.actors[0].name).toBe('User');
     expect(element.innerText).not.toContain('@startuml');
     element.querySelector<HTMLButtonElement>('[aria-label="Fermer la fenêtre de modification"]')!.click(); fixture.detectChanges();
     expect(element.querySelector('[role="dialog"]')).toBeNull();
