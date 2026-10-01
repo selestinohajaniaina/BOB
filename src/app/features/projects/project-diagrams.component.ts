@@ -1,18 +1,24 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, HostListener, OnDestroy, inject } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
 import { Project, ProjectService } from '../../core/services/project.service';
 import { Diagram, DiagramService } from '../../core/services/diagram.service';
+import { render } from 'puml-canvas-js';
 
 @Component({ selector: 'app-project-diagrams', standalone: true, imports: [RouterLink, ReactiveFormsModule, DatePipe], templateUrl: './project-diagrams.component.html' })
-export class ProjectDiagramsComponent implements OnDestroy {
+export class ProjectDiagramsComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly projectService = inject(ProjectService);
   private readonly diagramService = inject(DiagramService);
-  private readonly svgUrls = new Map<number, string>();
+  private renderHost: HTMLElement | null = null;
+  @ViewChild('diagramCanvas')
+  set diagramCanvas(element: ElementRef<HTMLElement> | undefined) {
+    this.renderHost = element?.nativeElement ?? null;
+    if (this.renderHost && this.selectedDiagram) this.renderDiagram(this.selectedDiagram);
+  }
   readonly promptControl = new FormControl('', { nonNullable: true, validators: [Validators.maxLength(4000)] });
   project: Project | null = null;
   diagrams: Diagram[] = [];
@@ -21,6 +27,7 @@ export class ProjectDiagramsComponent implements OnDestroy {
   isGenerating = false;
   deletingId: number | null = null;
   openingId: number | null = null;
+  renderError = '';
   error = '';
   success = '';
   readonly projectId: number;
@@ -46,16 +53,15 @@ export class ProjectDiagramsComponent implements OnDestroy {
     this.isGenerating = true;
     this.promptControl.disable();
     this.diagramService.generateUseCase(this.projectId, this.promptControl.getRawValue().trim()).pipe(finalize(() => { this.isGenerating = false; this.promptControl.enable(); })).subscribe({
-      next: ({ diagram, message }) => { this.diagrams = [diagram, ...this.diagrams]; this.selectedDiagram = diagram; this.promptControl.reset(); this.success = message || 'Diagramme généré avec succès.'; },
+      next: ({ diagram, message }) => { this.diagrams = [diagram, ...this.diagrams]; this.selectDiagram(diagram); this.promptControl.reset(); this.success = message || 'Diagramme généré avec succès.'; },
       error: (error: HttpErrorResponse) => this.error = error.status === 0 ? 'Impossible de joindre le serveur BOB.' : error.error?.message || 'La génération du diagramme a échoué. Veuillez réessayer.'
     });
   }
   open(diagram: Diagram): void {
     this.success = ''; this.error = '';
-    if (diagram.svg) { this.selectedDiagram = diagram; return; }
     this.openingId = diagram.id;
     this.diagramService.getDiagram(this.projectId, diagram.id).pipe(finalize(() => this.openingId = null)).subscribe({
-      next: ({ diagram: loaded }) => { this.diagrams = this.diagrams.map((item) => item.id === loaded.id ? loaded : item); this.selectedDiagram = loaded; },
+      next: ({ diagram: loaded }) => { this.diagrams = this.diagrams.map((item) => item.id === loaded.id ? loaded : item); this.selectDiagram(loaded); },
       error: (error: HttpErrorResponse) => this.error = error.error?.message || 'Impossible d’afficher le diagramme.'
     });
   }
@@ -63,17 +69,34 @@ export class ProjectDiagramsComponent implements OnDestroy {
     if (!confirm(`Supprimer « ${diagram.name} » ?`)) return;
     this.deletingId = diagram.id; this.error = '';
     this.diagramService.deleteDiagram(this.projectId, diagram.id).pipe(finalize(() => this.deletingId = null)).subscribe({
-      next: () => { this.revokeSvgUrl(diagram.id); this.diagrams = this.diagrams.filter((item) => item.id !== diagram.id); if (this.selectedDiagram?.id === diagram.id) this.selectedDiagram = null; },
+      next: () => { this.diagrams = this.diagrams.filter((item) => item.id !== diagram.id); if (this.selectedDiagram?.id === diagram.id) { this.selectedDiagram = null; this.renderError = ''; } },
       error: (error: HttpErrorResponse) => this.error = error.error?.message || 'Impossible de supprimer le diagramme.'
     });
   }
-  svgUrl(diagram: Diagram): string {
-    const cached = this.svgUrls.get(diagram.id);
-    if (cached) return cached;
-    const url = URL.createObjectURL(new Blob([diagram.svg || ''], { type: 'image/svg+xml' }));
-    this.svgUrls.set(diagram.id, url);
-    return url;
+  private selectDiagram(diagram: Diagram): void {
+    this.renderError = '';
+    this.selectedDiagram = diagram;
+    if (this.renderHost) this.renderDiagram(diagram);
   }
-  private revokeSvgUrl(id: number): void { const url = this.svgUrls.get(id); if (url) URL.revokeObjectURL(url); this.svgUrls.delete(id); }
-  ngOnDestroy(): void { for (const url of this.svgUrls.values()) URL.revokeObjectURL(url); this.svgUrls.clear(); }
+  private renderDiagram(diagram: Diagram): void {
+    const host = this.renderHost;
+    if (!host) return;
+    host.replaceChildren();
+    this.renderError = '';
+    try {
+      const svg = render(diagram.plantUml);
+      svg.setAttribute('role', 'img');
+      svg.setAttribute('aria-label', `Diagramme de cas d’utilisation ${diagram.name}`);
+      svg.style.display = 'block';
+      svg.style.margin = 'auto';
+      svg.style.maxWidth = '100%';
+      svg.style.height = 'auto';
+      host.appendChild(svg);
+    } catch (error) {
+      console.error('Échec du rendu PlantUML côté navigateur', error);
+      queueMicrotask(() => {
+        this.renderError = 'Impossible d’afficher ce diagramme. Le code PlantUML enregistré semble invalide ou non pris en charge.';
+      });
+    }
+  }
 }

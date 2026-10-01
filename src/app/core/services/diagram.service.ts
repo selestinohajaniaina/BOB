@@ -9,7 +9,7 @@ export interface Diagram {
   name: string;
   type: 'use_case';
   prompt: string;
-  svg: string | null;
+  plantUml: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -136,28 +136,28 @@
             >Cas d’utilisation</span
           >}
         </div>
-        @if (isGenerating) {
+        @if (isGenerating || openingId !== null) {
         <div
           class="mt-8 flex min-h-96 flex-col items-center justify-center rounded-2xl bg-slate-50 text-center"
         >
           <span
             class="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-emerald-500"
           ></span>
-          <p class="mt-5 font-bold">BOB analyse le contexte du projet…</p>
+          <p class="mt-5 font-bold">{{ isGenerating ? "BOB analyse le contexte du projet…" : "Chargement du diagramme…" }}</p>
           <p class="mt-2 text-sm text-slate-500">
             La génération peut prendre quelques instants.
           </p>
         </div>
         } @else if (selectedDiagram) {
         <div
-          class="mt-6 overflow-auto rounded-2xl border border-slate-200 bg-white p-3"
+          class="mt-6 min-h-96 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-4"
         >
-          <img
-            [src]="svgUrl(selectedDiagram)"
-            [alt]="'Diagramme de cas d’utilisation ' + selectedDiagram.name"
-            class="mx-auto h-auto max-w-full"
-            loading="lazy"
-          />
+          @if (renderError) {
+          <div role="alert" class="flex min-h-80 items-center justify-center px-6 text-center text-red-700">
+            <p class="max-w-lg">{{ renderError }}</p>
+          </div>
+          }
+          <div #diagramCanvas class="flex min-h-80 min-w-max items-center justify-center" [class.hidden]="renderError"></div>
         </div>
         } @else {
         <div

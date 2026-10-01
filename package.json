@@ -21,6 +21,7 @@
     "@tailwindcss/postcss": "^4.1.14",
     "marked": "^18.0.14",
     "postcss": "^8.5.6",
+    "puml-canvas-js": "^0.10.0",
     "rxjs": "~7.8.0",
     "tailwindcss": "^4.1.14",
     "tslib": "^2.3.0",
