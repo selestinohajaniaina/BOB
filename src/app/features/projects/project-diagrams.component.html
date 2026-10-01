@@ -110,7 +110,7 @@
             type="button"
             (click)="generate()"
             [disabled]="isGenerating || promptControl.invalid"
-            class="flex w-full items-center justify-center rounded-xl bg-emerald-500 px-5 py-3 font-bold text-slate-950 hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-50"
+            class="flex w-full items-center justify-center rounded-xl bg-emerald-500 px-5 py-3 font-bold text-slate-950 hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
           >
             {{ isGenerating ? "Génération en cours…" : "Générer le diagramme" }}
           </button>
@@ -131,10 +131,18 @@
               Aperçu du diagramme
             </h2>
           </div>
-          @if (selectedDiagram) {<span
-            class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700"
-            >Cas d’utilisation</span
-          >}
+          @if (selectedDiagram) {
+          <div class="flex flex-wrap items-center justify-end gap-2">
+            <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">Cas d’utilisation</span>
+            <button
+              type="button"
+              (click)="openEditModal()"
+              class="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-emerald-600 focus:outline-none focus:ring-4 focus:ring-emerald-100 cursor-pointer"
+            >
+              Modifier
+            </button>
+          </div>
+          }
         </div>
         @if (isGenerating || openingId !== null) {
         <div
@@ -216,14 +224,14 @@
               type="button"
               (click)="open(diagram)"
               [disabled]="openingId === diagram.id"
-              class="rounded-lg bg-slate-950 px-3 py-2 text-sm font-bold text-white"
+              class="rounded-lg bg-slate-950 px-3 py-2 text-sm font-bold text-white cursor-pointer"
             >
               {{ openingId === diagram.id ? "Ouverture…" : "Ouvrir" }}</button
             ><button
               type="button"
               (click)="delete(diagram)"
               [disabled]="deletingId === diagram.id"
-              class="rounded-lg border border-red-200 px-3 py-2 text-sm font-bold text-red-600 disabled:opacity-50"
+              class="rounded-lg border border-red-200 px-3 py-2 text-sm font-bold text-red-600 disabled:opacity-50 cursor-pointer"
             >
               {{ deletingId === diagram.id ? "Suppression…" : "Supprimer" }}
             </button>
@@ -236,3 +244,44 @@
     }
   </div>
 </main>
+@if (isEditModalOpen && selectedDiagram) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-3 sm:p-6" role="presentation">
+  <section
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="edit-diagram-title"
+    class="flex max-h-[92vh] w-full max-w-6xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl"
+  >
+    <header class="flex items-center justify-between gap-4 border-b border-slate-200 px-5 py-4 sm:px-7">
+      <div>
+        <p class="text-xs font-bold uppercase tracking-widest text-emerald-600">Cas d’utilisation</p>
+        <h2 id="edit-diagram-title" class="mt-1 text-xl font-bold sm:text-2xl">Modifier le diagramme</h2>
+      </div>
+      <button
+        type="button"
+        (click)="closeEditModal()"
+        aria-label="Fermer la fenêtre de modification"
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-2xl text-slate-500 hover:bg-slate-100 hover:text-slate-950 focus:outline-none focus:ring-4 focus:ring-emerald-100"
+      >
+        ×
+      </button>
+    </header>
+    <div class="flex min-h-[50vh] flex-1 items-center justify-center overflow-auto bg-slate-50 px-6 py-12 text-center sm:min-h-[60vh]">
+      <div>
+        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-2xl text-emerald-700" aria-hidden="true">◇</div>
+        <h3 class="mt-5 text-xl font-bold">Modification du diagramme</h3>
+        <p class="mt-2 text-slate-500">L’éditeur UML sera disponible ici prochainement.</p>
+      </div>
+    </div>
+    <footer class="flex justify-end border-t border-slate-200 px-5 py-4 sm:px-7">
+      <button
+        type="button"
+        (click)="closeEditModal()"
+        class="rounded-xl border border-slate-300 px-5 py-2.5 font-bold text-slate-700 hover:border-slate-400 hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-emerald-100"
+      >
+        Annuler
+      </button>
+    </footer>
+  </section>
+</div>
+}

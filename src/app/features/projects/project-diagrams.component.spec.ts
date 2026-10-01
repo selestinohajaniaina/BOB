@@ -45,6 +45,26 @@ describe('ProjectDiagramsComponent', () => {
     fixture.componentInstance.generate();
     expect(diagramService.generateUseCase).toHaveBeenCalledWith(15, '');
   });
+  it('opens and closes the preparatory edit modal without changing the diagram', () => {
+    const diagram = { id: 4, projectId: 15, name: 'Cas d’utilisation', type: 'use_case' as const, prompt: '', plantUml: '@startuml\nactor User\nUser --> (Login)\n@enduml', createdAt: '2026-01-01', updatedAt: '2026-01-01' };
+    diagramService.generateUseCase.and.returnValue(of({ message: 'ok', diagram }));
+    fixture.componentInstance.generate(); fixture.detectChanges();
+    const element = fixture.nativeElement as HTMLElement;
+    const modifyButton = Array.from(element.querySelectorAll('button')).find((button) => button.textContent?.trim() === 'Modifier')!;
+    modifyButton.click(); fixture.detectChanges();
+    expect(element.querySelector('[role="dialog"]')).not.toBeNull();
+    expect(element.innerText).toContain('L’éditeur UML sera disponible ici prochainement.');
+    expect(element.innerText).not.toContain('@startuml');
+    element.querySelector<HTMLButtonElement>('[aria-label="Fermer la fenêtre de modification"]')!.click(); fixture.detectChanges();
+    expect(element.querySelector('[role="dialog"]')).toBeNull();
+    expect(fixture.componentInstance.selectedDiagram).toBe(diagram);
+
+    modifyButton.click(); fixture.detectChanges();
+    const cancelButton = Array.from(element.querySelectorAll('button')).find((button) => button.textContent?.trim() === 'Annuler')!;
+    cancelButton.click(); fixture.detectChanges();
+    expect(element.querySelector('[role="dialog"]')).toBeNull();
+    expect(fixture.componentInstance.selectedDiagram).toBe(diagram);
+  });
   it('shows the backend generation error', () => {
     diagramService.generateUseCase.and.returnValue(throwError(() => new HttpErrorResponse({ status: 502, error: { message: 'Réponse IA invalide' } })));
     fixture.componentInstance.promptControl.setValue('Acteurs'); fixture.componentInstance.generate(); fixture.detectChanges();

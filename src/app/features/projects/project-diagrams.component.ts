@@ -27,12 +27,15 @@ export class ProjectDiagramsComponent {
   isGenerating = false;
   deletingId: number | null = null;
   openingId: number | null = null;
+  isEditModalOpen = false;
   renderError = '';
   error = '';
   success = '';
   readonly projectId: number;
   @HostListener('submit', ['$event'])
   preventNativeSubmit(event: SubmitEvent): void { event.preventDefault(); }
+  @HostListener('document:keydown.escape')
+  closeEditModalOnEscape(): void { this.closeEditModal(); }
   constructor() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.projectId = id;
@@ -73,6 +76,10 @@ export class ProjectDiagramsComponent {
       error: (error: HttpErrorResponse) => this.error = error.error?.message || 'Impossible de supprimer le diagramme.'
     });
   }
+  openEditModal(): void {
+    if (this.selectedDiagram) this.isEditModalOpen = true;
+  }
+  closeEditModal(): void { this.isEditModalOpen = false; }
   private selectDiagram(diagram: Diagram): void {
     this.renderError = '';
     this.selectedDiagram = diagram;
