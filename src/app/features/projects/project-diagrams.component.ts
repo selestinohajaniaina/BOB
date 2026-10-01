@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, HostListener, ViewChild, inject } from '@angular/core';
-import { DatePipe, JsonPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
@@ -11,7 +11,7 @@ import { BobDiagram } from './diagram-editor/bob-diagram.model';
 import { PlantUmlToBobJsonService } from './diagram-editor/plant-uml-to-bob-json.service';
 import { UseCaseEditorComponent } from './diagram-editor/use-case-editor.component';
 
-@Component({ selector: 'app-project-diagrams', standalone: true, imports: [RouterLink, ReactiveFormsModule, DatePipe, JsonPipe, UseCaseEditorComponent], templateUrl: './project-diagrams.component.html' })
+@Component({ selector: 'app-project-diagrams', standalone: true, imports: [RouterLink, ReactiveFormsModule, DatePipe, UseCaseEditorComponent], templateUrl: './project-diagrams.component.html' })
 export class ProjectDiagramsComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly projectService = inject(ProjectService);
@@ -31,7 +31,7 @@ export class ProjectDiagramsComponent {
   isGenerating = false;
   deletingId: number | null = null;
   isEditModalOpen = false;
-  bobDiagram: BobDiagram | null = null;
+  editingDiagram: BobDiagram | null = null;
   editorError = '';
   renderError = '';
   error = '';
@@ -81,15 +81,19 @@ export class ProjectDiagramsComponent {
     if (!this.selectedDiagram) return;
     this.editorError = '';
     try {
-      this.bobDiagram = this.plantUmlToBobJson.convert(this.selectedDiagram.plantUml);
+      this.editingDiagram = this.plantUmlToBobJson.convert(this.selectedDiagram.plantUml);
     } catch (error) {
       console.error('Échec de la conversion PlantUML vers le modèle BOB', error);
-      this.bobDiagram = null;
+      this.editingDiagram = null;
       this.editorError = 'Impossible de préparer ce diagramme pour l’éditeur.';
     }
     this.isEditModalOpen = true;
   }
-  closeEditModal(): void { this.isEditModalOpen = false; }
+  closeEditModal(): void {
+    this.isEditModalOpen = false;
+    this.editingDiagram = null;
+    this.editorError = '';
+  }
   private selectDiagram(diagram: Diagram): void {
     this.renderError = '';
     this.selectedDiagram = diagram;

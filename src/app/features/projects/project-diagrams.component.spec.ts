@@ -58,7 +58,7 @@ describe('ProjectDiagramsComponent', () => {
 
     fixture.componentInstance.openEditModal();
     fixture.detectChanges();
-    expect(fixture.componentInstance.bobDiagram?.actors[0].name).toBe('User');
+    expect(fixture.componentInstance.editingDiagram?.actors[0].name).toBe('User');
   });
   it('opens and closes the preparatory edit modal without changing the diagram', () => {
     const diagram = { id: 4, projectId: 15, name: 'Cas d’utilisation', type: 'use_case' as const, prompt: '', plantUml: '@startuml\nactor User\nUser --> (Login)\n@enduml', createdAt: '2026-01-01', updatedAt: '2026-01-01' };
@@ -69,12 +69,15 @@ describe('ProjectDiagramsComponent', () => {
     modifyButton.click(); fixture.detectChanges();
     expect(element.querySelector('[role="dialog"]')).not.toBeNull();
     expect(element.querySelector('app-use-case-editor')).not.toBeNull();
-    expect(element.innerText).toContain('BOB Diagram JSON');
-    expect(fixture.componentInstance.bobDiagram?.actors[0].name).toBe('User');
+    expect(element.innerText).toContain('Éditeur visuel');
+    expect(element.innerText).not.toContain('BOB Diagram JSON');
+    expect(fixture.componentInstance.editingDiagram?.actors[0].name).toBe('User');
     expect(element.innerText).not.toContain('@startuml');
     element.querySelector<HTMLButtonElement>('[aria-label="Fermer la fenêtre de modification"]')!.click(); fixture.detectChanges();
     expect(element.querySelector('[role="dialog"]')).toBeNull();
     expect(fixture.componentInstance.selectedDiagram).toBe(diagram);
+    expect(fixture.componentInstance.editingDiagram).toBeNull();
+    expect(diagramService.deleteDiagram).not.toHaveBeenCalled();
 
     modifyButton.click(); fixture.detectChanges();
     const cancelButton = Array.from(element.querySelectorAll('button')).find((button) => button.textContent?.trim() === 'Annuler')!;
